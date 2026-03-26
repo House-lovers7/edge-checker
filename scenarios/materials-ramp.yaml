@@ -1,0 +1,37 @@
+name: materials-ramp-boundary
+description: Ramp up traffic to /assets/materials/ to find the rate policy trigger boundary
+
+target:
+  base_url: https://staging.example.com
+  host: staging.example.com
+  path: /assets/materials/document.pdf
+  method: GET
+
+execution:
+  mode: ramp
+  duration: 60s
+  timeout: 10s
+  concurrency: 10
+
+rate:
+  rps: 10
+  ramp:
+    start_rps: 5
+    end_rps: 100
+    step_duration: 10s
+
+profile: crawler-like
+
+safety:
+  environment: staging
+  max_total_requests: 5000
+  allow_hosts:
+    - staging.example.com
+
+expect:
+  block_status_codes: [403, 429]
+  block_within_seconds: 60
+  min_block_ratio: 0.10
+
+output:
+  json: results/result-{{timestamp}}-{{name}}.json

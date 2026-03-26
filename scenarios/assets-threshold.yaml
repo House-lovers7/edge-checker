@@ -1,0 +1,33 @@
+name: assets-threshold-check
+description: Verify Akamai rate policy triggers on sustained static asset access to /assets/images/medium/
+
+target:
+  base_url: https://staging.example.com
+  host: staging.example.com
+  path: /assets/images/medium/sample.jpg
+  method: GET
+
+execution:
+  mode: constant
+  duration: 30s
+  timeout: 10s
+  concurrency: 5
+
+rate:
+  rps: 60
+
+profile: bot-like
+
+safety:
+  environment: staging
+  max_total_requests: 5000
+  allow_hosts:
+    - staging.example.com
+
+expect:
+  block_status_codes: [403, 429]
+  block_within_seconds: 60
+  min_block_ratio: 0.20
+
+output:
+  json: results/result-{{timestamp}}-{{name}}.json

@@ -1,0 +1,38 @@
+name: assets-burst-threshold
+description: Check whether Akamai rate policy triggers on burst traffic to /assets/images/medium/
+
+target:
+  base_url: https://staging.example.com
+  host: staging.example.com
+  path: /assets/images/medium/sample.jpg
+  method: GET
+
+execution:
+  mode: burst
+  duration: 60s
+  timeout: 10s
+  concurrency: 10
+
+rate:
+  rps: 15
+  burst:
+    spike_rps: 100
+    spike_duration: 5s
+    interval: 15s
+
+profile: bot-like
+
+safety:
+  environment: staging
+  max_total_requests: 5000
+  allow_hosts:
+    - staging.example.com
+
+expect:
+  block_status_codes: [403, 429]
+  block_within_seconds: 30
+  min_block_ratio: 0.15
+
+output:
+  json: results/result-{{timestamp}}-{{name}}.json
+  markdown: results/report-{{timestamp}}-{{name}}.md

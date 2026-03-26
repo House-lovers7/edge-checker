@@ -1,0 +1,39 @@
+name: assets-cooldown-check
+description: Verify Penalty Box release timing after rate limit trigger on /assets/images/medium/
+
+target:
+  base_url: https://staging.example.com
+  host: staging.example.com
+  path: /assets/images/medium/sample.jpg
+  method: GET
+
+execution:
+  mode: cooldown-check
+  duration: 120s
+  timeout: 10s
+  concurrency: 5
+
+rate:
+  rps: 60
+  cooldown:
+    active_duration: 15s
+    active_rps: 80
+    wait_duration: 60s
+    probe_rps: 1
+
+profile: bot-like
+
+safety:
+  environment: staging
+  max_total_requests: 5000
+  allow_hosts:
+    - staging.example.com
+
+expect:
+  block_status_codes: [403, 429]
+  block_within_seconds: 15
+  min_block_ratio: 0.10
+
+output:
+  json: results/result-{{timestamp}}-{{name}}.json
+  markdown: results/report-{{timestamp}}-{{name}}.md

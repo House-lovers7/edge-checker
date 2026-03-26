@@ -1,0 +1,32 @@
+name: example-rate-limit
+description: Example scenario to verify rate limiting on a test endpoint
+
+target:
+  base_url: https://httpbin.org
+  path: /get
+  method: GET
+
+execution:
+  mode: constant
+  duration: 10s
+  timeout: 5s
+  concurrency: 3
+
+rate:
+  rps: 10
+
+profile: browser-like
+
+safety:
+  environment: staging
+  max_total_requests: 200
+  allow_hosts:
+    - httpbin.org
+
+expect:
+  block_status_codes: [429]
+  block_within_seconds: 10
+  min_block_ratio: 0.10
+
+output:
+  json: results/result-{{timestamp}}-{{name}}.json

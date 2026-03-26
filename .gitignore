@@ -1,0 +1,19 @@
+# Binary (root only, not cmd/edge-checker/ directory)
+/edge-checker
+
+# Test results (keep .gitkeep)
+results/*.json
+results/*.md
+!results/.gitkeep
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Go
+vendor/
