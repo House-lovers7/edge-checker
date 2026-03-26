@@ -4,7 +4,7 @@ COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo "none")
 DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 LDFLAGS=-ldflags "-X github.com/House-lovers7/edge-checker/internal/version.Version=$(VERSION) -X github.com/House-lovers7/edge-checker/internal/version.Commit=$(COMMIT) -X github.com/House-lovers7/edge-checker/internal/version.Date=$(DATE)"
 
-.PHONY: build test clean
+.PHONY: build test clean web-install web-dev web-build
 
 build:
 	go build $(LDFLAGS) -o $(BINARY_NAME) ./cmd/edge-checker
@@ -14,3 +14,12 @@ test:
 
 clean:
 	rm -f $(BINARY_NAME)
+
+web-install:
+	cd web && npm install
+
+web-dev:
+	cd web && npm run dev
+
+web-build:
+	cd web && npm run build
