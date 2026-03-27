@@ -3,6 +3,7 @@ package judge
 import (
 	"fmt"
 
+	"github.com/House-lovers7/edge-checker/internal/engine"
 	"github.com/House-lovers7/edge-checker/internal/observe"
 	"github.com/House-lovers7/edge-checker/internal/scenario"
 )
@@ -33,15 +34,26 @@ type Verdict struct {
 
 // Judge evaluates collected metrics against expected outcomes.
 func Judge(metrics *observe.Metrics, expect *scenario.Expect) *Verdict {
+	return JudgeWithProbes(metrics, expect, nil)
+}
+
+// JudgeWithProbes evaluates metrics and probe results against expected outcomes.
+func JudgeWithProbes(metrics *observe.Metrics, expect *scenario.Expect, probeResults []engine.ProbeResult) *Verdict {
 	v := &Verdict{
 		Overall: StatusPass,
 	}
 
-	// Rule 1: Block detection — did block-like statuses appear within the expected time?
+	// Rule 1: Block detection
 	v.Rules = append(v.Rules, checkBlockDetection(metrics, expect))
 
-	// Rule 2: Block ratio — was the overall block ratio sufficient?
+	// Rule 2: Block ratio
 	v.Rules = append(v.Rules, checkBlockRatio(metrics, expect))
+
+	// Rule 3: False positive (unaffected paths)
+	v.Rules = append(v.Rules, CheckFalsePositive(probeResults))
+
+	// Rule 4: Bypass check
+	v.Rules = append(v.Rules, CheckBypass(probeResults))
 
 	// Determine overall
 	for _, r := range v.Rules {

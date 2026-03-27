@@ -108,6 +108,53 @@ func (c *Client) Do(ctx context.Context, method, url string) *Response {
 	}
 }
 
+// DoWithHeaders sends a request with additional headers merged on top of profile + extraHeaders.
+func (c *Client) DoWithHeaders(ctx context.Context, method, url string, additionalHeaders map[string]string) *Response {
+	start := time.Now()
+
+	req, err := http.NewRequestWithContext(ctx, method, url, nil)
+	if err != nil {
+		return &Response{
+			Timestamp: start,
+			Duration:  time.Since(start),
+			Error:     fmt.Sprintf("request creation failed: %v", err),
+		}
+	}
+
+	if c.profile != nil {
+		for k, v := range c.profile.Headers {
+			req.Header.Set(k, v)
+		}
+	}
+	for k, v := range c.extraHeaders {
+		req.Header.Set(k, v)
+	}
+	for k, v := range additionalHeaders {
+		req.Header.Set(k, v)
+	}
+	if c.host != "" {
+		req.Host = c.host
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return &Response{
+			Timestamp: start,
+			Duration:  time.Since(start),
+			Error:     fmt.Sprintf("request failed: %v", err),
+		}
+	}
+	defer resp.Body.Close()
+
+	bodySize, _ := io.Copy(io.Discard, resp.Body)
+	return &Response{
+		StatusCode: resp.StatusCode,
+		Duration:   time.Since(start),
+		BodySize:   bodySize,
+		Timestamp:  start,
+	}
+}
+
 // Close cleans up the client's transport.
 func (c *Client) Close() {
 	c.httpClient.CloseIdleConnections()

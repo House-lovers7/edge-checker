@@ -29,8 +29,8 @@ func TestJudge_BlockDetectionPass(t *testing.T) {
 	if v.Overall != StatusPass {
 		t.Errorf("expected PASS, got %s", v.Overall)
 	}
-	if len(v.Rules) != 2 {
-		t.Errorf("expected 2 rules, got %d", len(v.Rules))
+	if len(v.Rules) != 4 {
+		t.Errorf("expected 4 rules, got %d", len(v.Rules))
 	}
 }
 

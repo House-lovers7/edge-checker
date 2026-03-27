@@ -170,7 +170,21 @@ func runRun(cmd *cobra.Command, args []string) error {
 	fmt.Printf("  Profile: %s\n", prof.Name)
 	fmt.Println()
 
-	// 9. Progress ticker
+	// 9. Start probe runner (unaffected paths + bypass scenarios)
+	probeRunner := engine.NewProbeRunner(s.Target.BaseURL, s.Target.Host, 5*time.Second)
+	probeDone := make(chan struct{})
+	if len(s.Expect.UnaffectedPaths) > 0 || len(s.Expect.BypassScenarios) > 0 {
+		fmt.Printf("  Probes:  %d unaffected path(s), %d bypass scenario(s)\n",
+			len(s.Expect.UnaffectedPaths), len(s.Expect.BypassScenarios))
+		go func() {
+			defer close(probeDone)
+			probeRunner.Run(ctx, client, s.Expect.UnaffectedPaths, s.Expect.BypassScenarios)
+		}()
+	} else {
+		close(probeDone)
+	}
+
+	// 10. Progress ticker
 	progressDone := make(chan struct{})
 	go func() {
 		defer close(progressDone)
@@ -192,9 +206,10 @@ func runRun(cmd *cobra.Command, args []string) error {
 		red.Printf("Engine error: %v\n", err)
 	}
 
-	// Wait for progress to finish
-	cancel() // ensure progress goroutine stops
+	// Wait for progress and probes to finish
+	cancel() // ensure progress + probe goroutines stop
 	<-progressDone
+	<-probeDone
 	progress.Finish()
 	fmt.Println()
 
@@ -231,7 +246,7 @@ func runRun(cmd *cobra.Command, args []string) error {
 			}},
 		}
 	} else {
-		result.Verdict = judge.Judge(metrics, &s.Expect)
+		result.Verdict = judge.JudgeWithProbes(metrics, &s.Expect, probeRunner.Results())
 	}
 
 	// 13. Print summary + verdict
