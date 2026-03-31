@@ -1,0 +1,9 @@
+edge-checker
+results/
+web/node_modules/
+web/dist/
+.git/
+.github/
+.claude/
+docs/
+*.md
