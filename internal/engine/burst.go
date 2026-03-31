@@ -101,7 +101,7 @@ func (b *Burst) Run(ctx context.Context, client *httpclient.Client, collector *o
 				<-sem
 				wg.Done()
 			}()
-			resp := client.Do(ctx, b.cfg.Method, b.cfg.TargetURL)
+			resp := client.Do(ctx, b.cfg.Method, b.cfg.BuildURL())
 			collector.Record(resp)
 		}()
 	}

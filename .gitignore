@@ -4,6 +4,7 @@
 # Test results (keep .gitkeep)
 results/*.json
 results/*.md
+results/*.db
 !results/.gitkeep
 
 # OS

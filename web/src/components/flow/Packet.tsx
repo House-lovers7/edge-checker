@@ -15,20 +15,26 @@ interface Props {
 
 export function Packet({ status, y, clientX, edgeX, originX, delay, onComplete }: Props) {
   const color = statusToColor(status);
-  const r = 5;
 
   if (status === 'pass') {
     return (
       <motion.circle
         cx={clientX}
         cy={y}
-        r={r}
+        r={4}
         fill={color}
-        initial={{ cx: clientX, opacity: 0.8 }}
-        animate={{ cx: originX, opacity: [0.8, 1, 0.8, 0] }}
+        initial={{ cx: clientX, opacity: 0, scale: 0.5 }}
+        animate={{
+          cx: originX,
+          cy: [y, y + (Math.random() - 0.5) * 10, y],
+          opacity: [0, 0.9, 0.9, 0],
+          scale: [0.5, 1, 1, 0.3],
+        }}
         transition={{
-          cx: { type: 'spring', stiffness: 30, damping: 12, delay },
-          opacity: { duration: 2.5, delay, times: [0, 0.3, 0.8, 1] },
+          cx: { type: 'spring', stiffness: 25, damping: 10, delay },
+          cy: { duration: 2.5, delay, ease: 'easeInOut' },
+          opacity: { duration: 2.8, delay, times: [0, 0.1, 0.75, 1] },
+          scale: { duration: 2.8, delay, times: [0, 0.1, 0.75, 1] },
         }}
         onAnimationComplete={onComplete}
       />
@@ -37,43 +43,56 @@ export function Packet({ status, y, clientX, edgeX, originX, delay, onComplete }
 
   if (status === 'block' || status === 'rate-limit') {
     return (
-      <>
+      <g>
+        {/* Impact flash at shield */}
+        <motion.circle
+          cx={edgeX - 30}
+          cy={y}
+          r={8}
+          fill={color}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: [0, 0.6, 0], scale: [0, 1.5, 0] }}
+          transition={{ duration: 0.4, delay: delay + 0.6 }}
+        />
+        {/* Packet */}
         <motion.circle
           cx={clientX}
           cy={y}
-          r={r}
+          r={4}
           fill={color}
-          initial={{ cx: clientX, opacity: 0.8 }}
+          initial={{ cx: clientX, opacity: 0, scale: 0.5 }}
           animate={{
-            cx: [clientX, edgeX - 30, clientX + 50],
-            opacity: [0.8, 1, 0],
+            cx: [clientX, edgeX - 35, clientX + 40],
+            opacity: [0, 0.9, 1, 0],
+            scale: [0.5, 1, 1.3, 0],
           }}
           transition={{
-            duration: 1.8,
+            duration: 1.6,
             delay,
-            times: [0, 0.4, 1],
-            ease: ['easeOut', 'easeIn'],
+            times: [0, 0.4, 0.5, 1],
+            ease: ['easeOut', 'easeOut', 'easeIn'],
           }}
           onAnimationComplete={onComplete}
         />
-      </>
+      </g>
     );
   }
 
-  // error
+  // error — flicker and fade
   return (
     <motion.circle
       cx={clientX}
       cy={y}
-      r={r}
+      r={4}
       fill={color}
-      initial={{ cx: clientX, opacity: 0.8 }}
+      initial={{ cx: clientX, opacity: 0 }}
       animate={{
-        cx: clientX + 100,
-        opacity: [0.8, 1, 0.5, 0],
+        cx: clientX + 80,
+        opacity: [0, 0.8, 0.3, 0.7, 0],
+        scale: [0.5, 1, 0.8, 1, 0],
       }}
       transition={{
-        duration: 1,
+        duration: 0.8,
         delay,
       }}
       onAnimationComplete={onComplete}

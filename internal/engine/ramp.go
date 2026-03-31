@@ -102,7 +102,7 @@ func (r *Ramp) Run(ctx context.Context, client *httpclient.Client, collector *ob
 				<-sem
 				wg.Done()
 			}()
-			resp := client.Do(ctx, r.cfg.Method, r.cfg.TargetURL)
+			resp := client.Do(ctx, r.cfg.Method, r.cfg.BuildURL())
 			collector.Record(resp)
 		}()
 	}

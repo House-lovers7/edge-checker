@@ -3,6 +3,9 @@ package engine
 import (
 	"context"
 	"fmt"
+	"math/rand/v2"
+	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/House-lovers7/edge-checker/internal/httpclient"
@@ -23,6 +26,31 @@ type Config struct {
 	RPS          int
 	Concurrency  int
 	MaxRequests  int
+	QueryStatic  map[string]string
+	QueryRandom  bool
+}
+
+// BuildURL returns the target URL with query parameters applied.
+// If QueryRandom is true, a unique _t parameter is appended for cache busting.
+func (c Config) BuildURL() string {
+	if len(c.QueryStatic) == 0 && !c.QueryRandom {
+		return c.TargetURL
+	}
+
+	u, err := url.Parse(c.TargetURL)
+	if err != nil {
+		return c.TargetURL
+	}
+
+	q := u.Query()
+	for k, v := range c.QueryStatic {
+		q.Set(k, v)
+	}
+	if c.QueryRandom {
+		q.Set("_t", strconv.FormatInt(rand.Int64(), 36))
+	}
+	u.RawQuery = q.Encode()
+	return u.String()
 }
 
 // New creates an appropriate Engine based on the scenario's execution mode.
@@ -33,6 +61,8 @@ func New(s *scenario.Scenario) (Engine, error) {
 		RPS:         s.Rate.RPS,
 		Concurrency: s.Execution.Concurrency,
 		MaxRequests: s.Safety.MaxTotalRequests,
+		QueryStatic: s.Query.Static,
+		QueryRandom: s.Query.RandomSuffix,
 	}
 
 	duration, err := s.Execution.ParseDuration()

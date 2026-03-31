@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@remotion/media-utils": "^4.0.441",
+    "@remotion/player": "^4.0.441",
     "framer-motion": "^12.38.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "recharts": "^3.8.1"
+    "recharts": "^3.8.1",
+    "remotion": "^4.0.441"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

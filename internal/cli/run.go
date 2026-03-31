@@ -18,6 +18,7 @@ import (
 	"github.com/House-lovers7/edge-checker/internal/profile"
 	"github.com/House-lovers7/edge-checker/internal/safety"
 	"github.com/House-lovers7/edge-checker/internal/scenario"
+	"github.com/House-lovers7/edge-checker/internal/store"
 	"github.com/House-lovers7/edge-checker/internal/version"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -270,7 +271,15 @@ func runRun(cmd *cobra.Command, args []string) error {
 	}
 	fmt.Printf("Results saved: %s\n", savedPath)
 
-	// 15. Save Markdown if configured
+	// 15. Save to SQLite history
+	if db, err := store.Open(""); err == nil {
+		defer db.Close()
+		if runID, err := db.Save(result); err == nil {
+			fmt.Printf("History saved: run #%d\n", runID)
+		}
+	}
+
+	// 16. Save Markdown if configured
 	if s.Output.Markdown != "" {
 		mdPath, err := output.WriteMarkdown(result, s.Output.Markdown)
 		if err != nil {

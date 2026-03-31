@@ -69,7 +69,7 @@ func (c *Constant) Run(ctx context.Context, client *httpclient.Client, collector
 				<-sem
 				wg.Done()
 			}()
-			resp := client.Do(ctx, c.cfg.Method, c.cfg.TargetURL)
+			resp := client.Do(ctx, c.cfg.Method, c.cfg.BuildURL())
 			collector.Record(resp)
 		}()
 	}

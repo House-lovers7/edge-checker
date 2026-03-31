@@ -5,6 +5,7 @@ import { PlaybackControls } from '../controls/PlaybackControls';
 import { SummaryCards } from '../dashboard/SummaryCards';
 import { StatusDonut } from '../dashboard/StatusDonut';
 import { TimelineChart } from '../dashboard/TimelineChart';
+import { LatencyDisplay } from '../dashboard/LatencyDisplay';
 import { VerdictBadge } from '../dashboard/VerdictBadge';
 
 interface Props {
@@ -40,6 +41,11 @@ export function MainLayout({ result, player }: Props) {
         </div>
         <div className="space-y-4">
           <StatusDonut statusCounts={accumulated.statusCounts} />
+          <LatencyDisplay
+            p50={result.summary.p50_latency_ms}
+            p95={result.summary.p95_latency_ms}
+            p99={result.summary.p99_latency_ms}
+          />
           {result.verdict && (
             <VerdictBadge
               verdict={result.verdict}
