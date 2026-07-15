@@ -62,8 +62,10 @@ go install github.com/House-lovers7/edge-checker/cmd/edge-checker@latest
 # 2. 実行計画の確認（リクエスト送信なし）
 ./edge-checker dry-run -f scenarios/assets-threshold.yaml
 
-# 3. シナリオ実行
-./edge-checker run -f scenarios/assets-threshold.yaml
+# 3. シナリオ実行（現在は信頼済み承認機構がないためfail-closed）
+./edge-checker run -f scenarios/assets-threshold.yaml \
+  --policy operator-policy.yaml \
+  --approve-target https://staging.example.com
 
 # 4. 結果の確認
 ./edge-checker show -r results/result-XXXXXXXX-XXXXXX-assets-threshold-check.json
@@ -72,7 +74,7 @@ go install github.com/House-lovers7/edge-checker/cmd/edge-checker@latest
 ./edge-checker report -r results/result-XXXXXXXX-XXXXXX-assets-threshold-check.json
 ```
 
-**推奨フロー: validate → dry-run → run の順に実行してください。**
+**現在の推奨フロー: validate → dry-run。`run`は署名済みpolicyまたは人間承認brokerの実装まで停止します。**
 
 dry-run で「何を、どれくらい、どこに打つか」を確認してから run に進むのが安全です。
 
@@ -91,7 +93,9 @@ YAML の構文エラー、必須フィールドの欠落、モード別設定の
 ### dry-run — 実行計画の表示
 
 ```bash
-./edge-checker dry-run -f scenarios/assets-burst.yaml
+./edge-checker dry-run -f scenarios/assets-burst.yaml \
+  --policy operator-policy.yaml \
+  --approve-target https://staging.example.com
 ```
 
 リクエストを一切送信せず、以下を表示します:
@@ -102,11 +106,12 @@ YAML の構文エラー、必須フィールドの欠落、モード別設定の
 
 ### run — シナリオ実行
 
+> **Fail-closed:** ローカルpolicy、SHA-256 digest、CLI承認フラグは、同一主体がすべて生成できるため信頼根拠になりません。署名検証または外部の人間承認brokerが実装されるまで、`run`はリクエスト送信前に必ず停止します。
+
 ```bash
-./edge-checker run -f scenarios/assets-threshold.yaml
-./edge-checker run -f scenarios/assets-threshold.yaml --allow-production
-./edge-checker run -f scenarios/assets-threshold.yaml --insecure
-./edge-checker run -f scenarios/assets-threshold.yaml -o custom-output.json
+./edge-checker run -f scenarios/assets-threshold.yaml \
+  --policy operator-policy.yaml \
+  --approve-target https://staging.example.com
 ```
 
 | フラグ | 説明 |
@@ -114,6 +119,10 @@ YAML の構文エラー、必須フィールドの欠落、モード別設定の
 | `-f <file>` | シナリオ YAML ファイル（必須） |
 | `--allow-production` | `environment: production` のシナリオを実行許可 |
 | `--insecure` | TLS 証明書検証をスキップ（自己署名証明書環境向け） |
+| `--policy` | scenario外で管理するoperator policy（必須） |
+| `--approve-target` | operatorが確認したtarget originの完全一致値（必須） |
+| `--allow-sensitive-headers` | policyでも許可された機密headerを明示許可 |
+| `--approve-host-override` | policyでも許可されたHost overrideを完全一致で承認 |
 | `-o <path>` | JSON 出力パスの上書き |
 
 ### show — 結果のターミナル表示
@@ -376,10 +385,10 @@ safety:
 
 | 項目 | 上限 |
 |------|------|
-| 最大リクエスト数 | 100,000 |
-| 最大並列数 | 100 |
-| 最大 RPS | 1,000 |
-| 最大実行時間 | 30 分 |
+| 最大リクエスト数 | 10,000 |
+| 最大並列数 | 20 |
+| 最大 RPS | 100 |
+| 最大実行時間 | 5 分 |
 
 ### 4. DNS 事前チェック
 
@@ -581,3 +590,17 @@ make clean    # バイナリ削除
 ## ライセンス
 
 Private
+
+<!-- BEGIN GENERATED ENGINEERING HANDBOOK -->
+## Engineering handbook
+
+- [Start here](./docs/engineering/README.md)
+- [Architecture / system diagram](./docs/engineering/02_architecture.md)
+- [API](./docs/engineering/04_api.md) / [Data model](./docs/engineering/05_data_model.md) / [Screens](./docs/engineering/06_screen_design.md)
+- Detected check: `npm run dev  # vite`, `npm run build  # tsc -b && vite build`, `npm run lint  # eslint .`
+- Snapshot: API 0 / entity 0 / screen 0 / test files 12
+- Data sources: persistent schema未検出
+- Handoff gaps: 4 P0/P1 items — [details](./docs/engineering/00_one_pager.md#引継ぎ時の未解決ギャップ)
+
+> Generated from the current checkout. Existing ADR/schema/runbook remains authoritative; production state is not asserted.
+<!-- END GENERATED ENGINEERING HANDBOOK -->
