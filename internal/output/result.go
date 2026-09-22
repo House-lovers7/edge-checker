@@ -9,14 +9,14 @@ import (
 
 // Result represents the complete output of a test run.
 type Result struct {
-	ScenarioName string            `json:"scenario_name"`
-	Description  string            `json:"description"`
-	StartedAt    time.Time         `json:"started_at"`
-	EndedAt      time.Time         `json:"ended_at"`
-	Duration     string            `json:"duration"`
-	Interrupted  bool              `json:"interrupted,omitempty"`
-	Target       TargetInfo        `json:"target"`
-	Execution    ExecutionInfo     `json:"execution"`
+	ScenarioName string                 `json:"scenario_name"`
+	Description  string                 `json:"description"`
+	StartedAt    time.Time              `json:"started_at"`
+	EndedAt      time.Time              `json:"ended_at"`
+	Duration     string                 `json:"duration"`
+	Interrupted  bool                   `json:"interrupted,omitempty"`
+	Target       TargetInfo             `json:"target"`
+	Execution    ExecutionInfo          `json:"execution"`
 	Summary      Summary                `json:"summary"`
 	Timeline     []observe.SecondBucket `json:"timeline"`
 	Verdict      *judge.Verdict         `json:"verdict,omitempty"`

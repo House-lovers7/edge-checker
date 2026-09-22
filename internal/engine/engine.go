@@ -21,13 +21,13 @@ type Engine interface {
 
 // Config holds the common configuration extracted from a Scenario for engine use.
 type Config struct {
-	TargetURL    string
-	Method       string
-	RPS          int
-	Concurrency  int
-	MaxRequests  int
-	QueryStatic  map[string]string
-	QueryRandom  bool
+	TargetURL   string
+	Method      string
+	RPS         int
+	Concurrency int
+	MaxRequests int
+	QueryStatic map[string]string
+	QueryRandom bool
 }
 
 // BuildURL returns the target URL with query parameters applied.

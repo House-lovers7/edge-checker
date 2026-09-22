@@ -47,9 +47,9 @@ func (e Execution) ParseTimeout() (time.Duration, error) {
 }
 
 type Rate struct {
-	RPS      int            `yaml:"rps"`
-	Burst    *BurstConfig   `yaml:"burst,omitempty"`
-	Ramp     *RampConfig    `yaml:"ramp,omitempty"`
+	RPS      int             `yaml:"rps"`
+	Burst    *BurstConfig    `yaml:"burst,omitempty"`
+	Ramp     *RampConfig     `yaml:"ramp,omitempty"`
 	Cooldown *CooldownConfig `yaml:"cooldown,omitempty"`
 }
 
@@ -84,11 +84,11 @@ type Safety struct {
 }
 
 type Expect struct {
-	BlockStatusCodes     []int              `yaml:"block_status_codes"`
-	BlockWithinSeconds   int                `yaml:"block_within_seconds"`
-	MinBlockRatio        float64            `yaml:"min_block_ratio"`
-	UnaffectedPaths      []UnaffectedPath   `yaml:"unaffected_paths"`
-	BypassScenarios      []BypassScenario   `yaml:"bypass_scenarios"`
+	BlockStatusCodes   []int            `yaml:"block_status_codes"`
+	BlockWithinSeconds int              `yaml:"block_within_seconds"`
+	MinBlockRatio      float64          `yaml:"min_block_ratio"`
+	UnaffectedPaths    []UnaffectedPath `yaml:"unaffected_paths"`
+	BypassScenarios    []BypassScenario `yaml:"bypass_scenarios"`
 }
 
 type UnaffectedPath struct {
@@ -110,9 +110,9 @@ type Output struct {
 
 // Valid execution modes.
 const (
-	ModeConstant     = "constant"
-	ModeBurst        = "burst"
-	ModeRamp         = "ramp"
+	ModeConstant      = "constant"
+	ModeBurst         = "burst"
+	ModeRamp          = "ramp"
 	ModeCooldownCheck = "cooldown-check"
 )
 
